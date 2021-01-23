@@ -1,0 +1,107 @@
+
+val logName = "Time Of Day"
+var Timer tod_Timer = null
+
+rule "Calculate time of day state" 
+when
+  System started or // run at system start in case the time changed when OH was offline
+  Channel "astro:sun:local:rise#event" triggered START or
+  Channel "astro:sun:local:set#event" triggered START or
+  Channel "astro:sun:local:minus90:set#event" triggered START or
+  Time cron "0 5 0 * * ? *" or // 5 minute after midnight so give Astro time to calculate the new day's times
+  Time cron "0 1 7 * * ? *" or // triggers at 07:01AM 
+  Time cron "0 21 7 * * ? *" or  // triggers at 07:21PM
+  Time cron "0 1 17 * * ? *" or // triggers at 17:01PM 
+  Time cron "0 1 18 * * ? *" or  // triggers at 18:01PM
+  Time cron "0 1 19 * * ? *" or // triggers at 19:01PM 
+  Time cron "0 1 21 * * ? *" or  // triggers at 21:01PM
+  Time cron "0 46 23 * * ? *" or  // triggers at 23:46PM
+  Item vTod_Trigger received command ON
+then
+
+  logInfo("tod_calc_tod_state.rule", "Calculating time of day based on:" + now)
+
+  // Calculate the times for the static tods and populate the associated Items
+  // Update when changing static times
+  // Jump to tomorrow and subtract to avoid problems at the change over to/from DST
+  /////////////////////////////////////////////////////////////////////////////////
+val stTime_Wakeup  	= now.withTimeAtStartOfDay.plusHours(7)                  //"07:00"
+val stTime_Morning  = now.withTimeAtStartOfDay.plusHours(7).plusMinutes(20)  //"07:20"
+val stTime_Cooking  = now.withTimeAtStartOfDay.plusHours(17)                 //"17:00"
+val stTime_Dinner  	= now.withTimeAtStartOfDay.plusHours(18)                 //"18:00"
+val stTime_Evening  = now.withTimeAtStartOfDay.plusHours(19)                 //"19:00"
+val stTime_Night  	= now.withTimeAtStartOfDay.plusHours(21)                 //"21:00"
+val stTime_Bed   	  = now.withTimeAtStartOfDay.plusHours(23).plusMinutes(45) //"23:45"
+
+// Convert the Astro Items to Joda DateTime
+val stStart_Day = new DateTime(vSunrise_Time.state.toString) 
+val stStart_Evening = new DateTime(vSunset_Time.state.toString)
+val stStart_Afternoon = (new DateTime(vSunset_Time.state.toString)).minusHours(1).minusMinutes(30)
+
+logInfo("tod_calc_tod_state.rule", "Start Afternoon date: " + stStart_Afternoon)
+
+vWakeup_Time.postUpdate  (stTime_Wakeup.toString)
+vMorning_Time.postUpdate (stTime_Morning.toString)
+vCooking_Time.postUpdate  (stTime_Cooking.toString)
+vDinner_Time.postUpdate  (stTime_Dinner.toString)
+vNight_Time.postUpdate   (stTime_Night.toString)
+vEvening_Time.postUpdate (stTime_Evening.toString)
+vBed_Time.postUpdate     (stTime_Bed.toString)
+
+  // Calculate the current time of day
+  var curr = "UNKNOWN"
+  switch now {
+  	case now.isAfter(stTime_Wakeup) && now.isBefore(stTime_Morning): {
+      if (now.isAfter(stStart_Day)) { 
+        curr = "WAKEUP_DAY" 
+      } else { 
+        curr = "WAKEUP" 
+      }
+    }
+    case now.isAfter(stTime_Morning) && now.isBefore(stStart_Afternoon): {
+      if (now.isAfter(stStart_Day)) { 
+        curr = "DAY" 
+      } else { 
+        curr = "MORNING" 
+      }
+    }
+  	case now.isAfter(stStart_Afternoon) && now.isBefore(stTime_Cooking): curr = "AFTERNOON"
+    case now.isAfter(stTime_Cooking) && now.isBefore(stTime_Dinner): {
+      if (now.isBefore(stStart_Evening)) {
+         curr = "COOKING_DAY"
+      } else {
+         curr = "COOKING"
+      }      
+    }
+    case now.isAfter(stTime_Dinner) && now.isBefore(stTime_Evening): {
+      if (now.isBefore(stStart_Evening)) {
+         curr = "DINNER_DAY" 
+      } else {
+         curr = "DINNER" 
+      }      
+    }
+    case now.isAfter(stTime_Evening) && now.isBefore(stTime_Night): {
+      if (now.isBefore(stStart_Evening)) {
+         curr = "EVENING_DAY"
+      } else {
+         curr = "EVENING" 
+      }     
+    }
+    case now.isAfter(stTime_Night) && now.isBefore(stTime_Bed): {
+      if (now.isBefore(stStart_Evening)) { 
+        curr = "NIGHT_DAY"
+      } else {
+        curr = "NIGHT" 
+      }     
+    }
+    case now.isAfter(stTime_Bed) && now.isBefore(stTime_Bed.plusDays(1)): curr = "BED"
+  	case now.isAfter(stTime_Bed.minusDays(1)) && now.isBefore(stTime_Wakeup): curr = "BED"  
+    default : curr = "UNSET"
+  }
+ 
+  // Publish the current state
+  logInfo("tod_calc_tod_state.rule", "Calculated time of day is: " + curr)
+  vTimeOfDay.sendCommand(curr)
+end
+
+

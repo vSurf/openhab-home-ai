@@ -1,0 +1,62 @@
+// Location group items ////////////////////////////////////////////////////////////////////////////
+Group								gHome					"MyHome"									<house>
+Group								gLivingroom				"Woonkamer"									<kitchen>		(gHome)
+Group								gHall					"Gang"										<corridor>		(gHome)
+Group								gGarden					"Tuin"										<garden>		(gHome)
+
+// Type group items //////////////////////////////////////////////////////////////////////////////////
+Group								gEnergy					"Energie"									<energy>		(gHome)
+Group:Number:SUM					gEnergy_kWh				"Gemeten Stroomverbruik [%.2f kWh]"			<energy>
+//Group:Number:COUNT(".*")			gEnergy_count																		(gEnergy_kWh)
+Group:Rollershutter:OR(UP, DOWN)	gShutter				"Zonnescherm"								<rollershutter>	(gHome)
+Group								gLight					"Licht"										<light>			(gHome)
+Group:Switch:OR(ON, OFF)			gLightSwitches			"Licht"														(gLight)
+Group:Dimmer						gLightDimmer			"Licht"														(gLight)
+Group:Number						gScene      			"Scene Button"								<moon>
+
+// Thing to items ///////////////////////////////////////////////////////////////////////////////////
+//
+// Z-wave items Switches
+Dimmer								Kitchen_Light			"Keuken"									<kitchen>		(gLivingroom, gLightDimmer)		{channel="zwave:device:12356614:node7:switch_dimmer"}
+Dimmer								KitchenNis_Light		"Keuken-Nis"								<kitchen>		(gLivingroom, gLightDimmer)		{channel="zwave:device:12356614:node10:switch_dimmer"}
+Switch								Hallway_Light			"Gang"										<corridor>		(gHall, gLightSwitches)			{channel="zwave:device:12356614:node5:switch_binary1"}
+Dimmer								Dining_Light			"Eettafel"									<light>			(gLivingroom, gLightDimmer)		{channel="zwave:device:12356614:node6:switch_dimmer"}
+Dimmer								LivingRoom_Light		"Zithoek"									<sofa>			(gLivingroom, gLightDimmer)		{channel="zwave:device:12356614:node2:switch_dimmer1"}
+Rollershutter						LivingRoom_Shutter		"Zonnescherm"								<rollershutter>	(gLivingroom, gShutter)			{channel="zwave:device:12356614:node4:blinds_control"}
+Switch								Garden_Light1			"Tuin Schutting"							<garden>		(gGarden, gLightSwitches)		{channel="zwave:device:12356614:node9:switch_binary1"}
+Switch								Garden_Light2			"Tuin Bomen"								<garden>		(gGarden, gLightSwitches)		{channel="zwave:device:12356614:node9:switch_binary2"}
+
+
+// Z-wave items Energy
+Number								Kitchen_Energy			"Keuken [%s kWh]"							<kitchen>		(gLivingroom, gEnergy_kWh)		{channel="zwave:device:12356614:node7:meter_kwh"}
+Number								KitchenNis_Energy		"Keuken-Nis [%s kWh]"						<kitchen>		(gLivingroom, gEnergy_kWh)		{channel="zwave:device:12356614:node10:meter_kwh"}
+Number								Hallway_Energy			"Gang [%s kWh]"								<corridor>		(gHall, gEnergy_kWh)			{channel="zwave:device:12356614:node5:meter_kwh1"}
+Number								Dining_Energy			"Eettafel [%s kWh]"							<light>			(gLivingroom, gEnergy_kWh)		{channel="zwave:device:12356614:node6:meter_kwh"}
+Number								LivRoom_sofa_Energy		"Zithoek [%s kWh]"							<sofa>			(gLivingroom, gEnergy_kWh)		{channel="zwave:device:12356614:node2:meter_kwh1"}
+Number								LivRoom_shut_Energy		"Zonnescherm [%s kWh]"						<rollershutter>	(gLivingroom, gEnergy_kWh)		{channel="zwave:device:12356614:node4:meter_kwh"}
+Number								Garden_Tree_Energy		"Tuin Schutting [%s kWh]"					<garden>		(gGarden, gEnergy_kWh)			{channel="zwave:device:12356614:node9:meter_kwh1"}
+Number								Garden_Fence_Energy		"Tuin Bomen [%s kWh]"						<garden>		(gGarden, gEnergy_kWh)			{channel="zwave:device:12356614:node9:meter_kwh2"}
+
+// Http items
+String								Http_YouLess_Total		"Stroomverbruik totaal [%s kWh]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }
+Number								Http_YouLess_Current	"Stroomverbruik actueel [%,.0f Watt]"		<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }
+Number								Http_YouLess_Signal		"Stroomverbruik signaal [%.0f %%]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }
+Number								Measured_kwh			"Gemeten Stroomverbruik [%s kWh]"			<energy>		(gEnergy)
+
+
+//Scene items
+Number								Kitchen_scene			"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node7:scene_number"}
+Number								KitchenNis_scene		"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node10:scene_number"}
+Number								Hallway_scene			"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node5:scene_number"}
+Number								Dining_scene			"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node6:scene_number"}
+Number								LivRoom_sofa_scene		"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node2:scene_number"}
+Number								LivRoom_shut_scene		"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node4:scene_number"}
+Number								Garden_scene			"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node9:scene_number"}
+
+Number:Temperature					Temperature			    "Temperature [%.2f %unit%]"                 <temperature>									{channel="openweathermap:weather-and-forecast:api:local:current#temperature"}
+Number:Temperature					ApparentTemperature 	"Apparent Temperature [%.2f %unit%]"        <temperature>									{channel="openweathermap:weather-and-forecast:api:local:current#apparent-temperature"}
+Number:Dimensionless				Clouds					"[%d %unit%]"                               <clouds>										{channel="openweathermap:weather-and-forecast:api:local:current#cloudiness"}
+Number:Dimensionless				Humidity				"[%d %unit%]"                               <humidity>										{channel="openweathermap:weather-and-forecast:api:local:current#humidity"}
+Number:Length						Rain					"[%.1f %unit%]"                             <rain>											{channel="openweathermap:weather-and-forecast:api:local:current#rain"}
+Number:Speed						WindSpeed				"WindSpeed [%.1f km/h]"                     <wind>											{channel="openweathermap:weather-and-forecast:api:local:current#wind-speed"}
+String								wLocation				"Location [%s]"																	            {channel="openweathermap:weather-and-forecast:api:local:station#name"}

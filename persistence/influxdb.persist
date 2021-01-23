@@ -1,0 +1,36 @@
+Strategies {
+    everyMinute : "0 * * * * ?"
+    everyHour : "0 0 * * * ?"
+    everyDay : "0 0 0 * * ?"
+    every2Minutes : "0 */2 * ? * *"
+    default = everyChange
+}
+ 
+Items {
+    gLight: strategy = everyChange
+    Kitchen_Light		: strategy = everyChange
+    KitchenNis_Light	: strategy = everyChange
+    Hallway_Light		: strategy = everyChange
+    Dining_Light		: strategy = everyChange
+    LivingRoom_Light	: strategy = everyChange
+    LivingRoom_Shutter	: strategy = everyChange
+    Garden_Light1		: strategy = everyChange
+    Garden_Light2		: strategy = everyChange
+    vTimeOfDay          : strategy = everyChange
+    gEnergy*,gEnergy_kWh*,Temperature,ApparentTemperature: strategy = everyMinute
+    RoomTemperature                 : strategy = everyChange
+    RoomSetpoint                    : strategy = everyChange
+    ControlSetpoint                 : strategy = everyChange
+    DomesticHotWaterTemperature     : strategy = everyChange
+    DomesticHotWaterSetpoint        : strategy = everyChange
+    BoilerWaterTemperature          : strategy = everyChange
+    ReturnWaterTemperature          : strategy = everyChange
+    CentralHeatingWaterPressure     : strategy = everyChange
+    CentralHeatingEnabled           : strategy = everyChange
+    CentralHeatingActive            : strategy = everyChange
+    DomesticHotWaterEnabled         : strategy = everyChange
+    DomesticHotWaterActive          : strategy = everyChange
+    BurnerActive                    : strategy = everyChange
+    RelativeModulationLevel         : strategy = everyChange
+    MaximumRelativeModulationLevel  : strategy = everyChange
+}

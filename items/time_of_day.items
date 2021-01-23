@@ -1,0 +1,13 @@
+String vTimeOfDay "Current Time of Day [MAP(timeofday_NL.map):%s]" <tod>
+Switch vTod_Trigger "Time of Day Trigger"	<tod>
+
+DateTime vWakeup_Time "WAKEUP [%1$tH:%1$tM]" <sunrise>
+DateTime vMorning_Time "MORNING [%1$tH:%1$tM]" <sunrise>
+DateTime vCooking_Time "COOKING [%1$tH:%1$tM]" <kitchen>
+DateTime vDinner_Time "DINNER [%1$tH:%1$tM]" <kitchen>
+DateTime vNight_Time "NIGHT [%1$tH:%1$tM]" <moon>
+DateTime vBed_Time "BED [%1$tH:%1$tM]" <bedroom_blue>
+
+DateTime vSunrise_Time "DAY [%1$tH:%1$tM]" <sun> { channel="astro:sun:local:rise#start" }
+DateTime vSunset_Time "EVENING [%1$tH:%1$tM]" <sunset> { channel="astro:sun:local:set#start" }
+//DateTime vEvening_Time "AFTERNOON [ %1$tH:%1$tM]" <sunset> { channel="astro:sun:local:set#start"}

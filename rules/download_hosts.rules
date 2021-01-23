@@ -1,0 +1,12 @@
+// download hostfiles from oisd and winhelp2002 via https (curl)
+rule "download_hosts"
+when
+    //Time cron At 01:00 AM
+    Time cron "0 0 1 1/1 * ? *"
+then
+	logInfo("download_hosts.rules", "Run the download_hosts rule ")
+	
+    executeCommandLine("curl -s -o /etc/openhab2/html/hosts0.txt https://winhelp2002.mvps.org/hosts.txt", 5000)
+    executeCommandLine("curl -s -o /etc/openhab2/html/hosts1.txt https://hosts.oisd.nl/light/", 5000)
+    logInfo("download_hosts.rules", "Done running the download_hosts rule ")
+end

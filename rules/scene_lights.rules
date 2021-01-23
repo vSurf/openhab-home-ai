@@ -1,0 +1,186 @@
+var Timer timer_AllLightsOff = null
+
+rule "scene_AllLightOff"
+when
+	Item Hallway_scene received update "1.3"or
+	Item vTimeOfDay changed to "BED" 
+then
+	logInfo("scene_AllLightOff.rules", "Run the Scene_AllLightOff scene rule "+gLight.state)
+	sendCommand(Kitchen_Light,18)
+	sendCommand(Dining_Light,0)
+	sendCommand(LivingRoom_Light,18)
+
+	//Set timer to 300s (5min) before turn of the lights
+	timer_AllLightsOff = createTimer(now.plusSeconds(300), [| 
+		logInfo("scene_AllLightOff.rules", "Wait Until Turn off all lights")
+		gLight.sendCommand(OFF)
+	])
+	postUpdate(SceneEvening, ON)
+	logInfo("scene_AllLightOff.rules", "End the Scene_AllLightOff scene rule "+gLight.state)
+end
+
+rule "scene_AllOff"
+when
+	Channel "astro:sun:local:morningNight#event" triggered START
+then
+	logInfo("scene_AllOff.rules", "Start Turn all lights off "+gLight.state)
+	gLight.sendCommand(OFF)
+	postUpdate(SceneEvening, ON)
+	logInfo("scene_AllOff.rules", "End Turn all lights off "+gLight.state)
+end	
+
+
+rule "scene_CancelAllLightOff"
+when
+	Item Hallway_scene changed to "1.4"
+then
+	logInfo("scene_CancelAllLightOff.rules", "Cancel the Scene_AllLightOff scene rule "+gLight.state)
+	timer_AllLightsOff.cancel
+	timer_AllLightsOff = null
+	SceneEvening.sendCommand(ON)
+	logInfo("scene_CancelAllLightOff.rules", "End the Cancel Scene_AllLightOff scene rule "+gLight.state)
+end
+
+rule "scene_LightAuto"
+when
+	Item gScene received command 3.0   // or 
+//	Channel "astro:sun:local:daylight#event" triggered END
+then
+	logInfo("scene_LightAuto.rules", "Run the lightauto scene rule "+gScene.state)
+	SendCommand.sendCommand("AA=28")
+	sendCommand(Kitchen_Light,25)
+	sendCommand(LivingRoom_Light,40)
+//	gGarden.sendCommand(ON)
+//  gGarden.members.filter[l|l.groupNames.contains("gLightSwitches")].forEach(i|i.sendCommand(ON))
+    sendCommand(Garden_Light1,ON)
+	postUpdate(gScene, 0)
+	postUpdate(KitchenNis_Light)
+	logInfo("scene_LightAuto.rules", "End the lightauto scene rule "+gScene.state)
+end
+
+
+
+rule "scene_Switch"
+when
+	Item vTimeOfDay received update or
+	Item gScene received update 1.0
+then
+	
+	val dim_Value_Kitchen = Kitchen_Light.state as Number  // state is of Type Number, so store it as a value
+	val dim_Value_KitchenNis = KitchenNis_Light.state as Number  // state is of Type Number, so store it as a value
+	val dim_Value_Dining = Dining_Light.state as Number  // state is of Type Number, so store it as a value
+	val dim_Value_LivingRoom = LivingRoom_Light.state as Number  // state is of Type Number, so store it as a value
+
+
+	if (vTimeOfDay.state == "WAKEUP_DAY") {
+		logInfo("scene_Switch.rules", "scene Switch to WAKEUP_DAY" ) 
+	}
+	if (vTimeOfDay.state == "WAKEUP") { 
+		logInfo("scene_Switch.rules", "scene Switch to WAKEUP" ) 
+
+    	if (dim_Value_Kitchen < 80) { sendCommand(Kitchen_Light,25) } // check if and than change value
+    	if (dim_Value_Dining < 80) { sendCommand(Dining_Light,25) } // check if not equal to any auto value
+		sendCommand(Garden_Light1,ON)
+	}
+	if (vTimeOfDay.state == "MORNING") { 
+		logInfo("scene_Switch.rules", "scene Switch to MORNING" ) 
+
+    	if (dim_Value_Kitchen < 80) { sendCommand(Kitchen_Light,100) } // check if and than change value
+    	if (dim_Value_Dining < 80) { sendCommand(Dining_Light,100) } // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,25) } // check if not equal to any auto value
+		sendCommand(Hallway_Light,ON)
+		sendCommand(Garden_Light1,ON)
+	}
+	if (vTimeOfDay.state == "DAY") { 
+		logInfo("scene_Switch.rules", "scene Switch to DAY 45 minus after day ligts of by scene_AllOff" ) 
+		
+		sendCommand(gGarden,OFF)
+		
+		timer_AllLightsOff = null
+		timer_AllLightsOff = createTimer(now.plusMinutes(45), [| 
+			logInfo("scene_AllLightOff.rules", "Wait Until Turn off all lights")
+			gLight.sendCommand(OFF)
+		])
+	}
+	if (vTimeOfDay.state == "AFTERNOON") { 
+		logInfo("scene_Switch.rules", "scene Switch to AFTERNOON" ) 
+	
+		sendCommand(Kitchen_Light,25)
+		sendCommand(LivingRoom_Light,40)
+		//	gGarden.sendCommand(ON)
+		//  gGarden.members.filter[l|l.groupNames.contains("gLightSwitches")].forEach(i|i.sendCommand(ON))
+	    sendCommand(Garden_Light1,ON)
+		postUpdate(SceneEvening, OFF)
+	}
+	if (vTimeOfDay.state == "COOKING_DAY") { 
+		logInfo("scene_Switch.rules", "scene Switch to COOKING_DAY" ) 
+	}
+	if (vTimeOfDay.state == "COOKING") { 
+		logInfo("scene_Switch.rules", "scene Switch to COOKING" ) 
+
+    	if (dim_Value_Kitchen < 80) { sendCommand(Kitchen_Light,100) } // check if and than change value
+    	if (dim_Value_Dining < 80) { sendCommand(Dining_Light,40) } // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,40) } // check if not equal to any auto value
+		sendCommand(Garden_Light1,ON)
+	}
+
+	if (vTimeOfDay.state == "DINNER_DAY") { 
+		logInfo("scene_Switch.rules", "scene Switch to DINNER_DAY" ) 
+	}
+	if (vTimeOfDay.state == "DINNER") { 
+		logInfo("scene_Switch.rules", "scene Switch to DINNER" ) 
+
+    	if (dim_Value_Kitchen < 80) { sendCommand(Kitchen_Light,100) } // check if and than change value
+		if (dim_Value_KitchenNis < 80) { sendCommand(KitchenNis_Light,100) } // check if not equal to any auto value
+    	if (dim_Value_Dining < 80) { sendCommand(Dining_Light,100) } // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,30) } // check if not equal to any auto value
+		sendCommand(Garden_Light1,ON)
+	}
+	if (vTimeOfDay.state == "EVENING_DAY") { 
+		logInfo("scene_Switch.rules", "scene Switch to EVENING_DAY" ) 
+	}
+	if (vTimeOfDay.state == "EVENING") { 
+		logInfo("scene_Switch.rules", "scene Switch to EVENING" )
+
+    	if (dim_Value_Kitchen > 40) { sendCommand(Kitchen_Light,25) } // check if and than change value
+		if (dim_Value_KitchenNis < 80) { sendCommand(KitchenNis_Light,100) } // check if not equal to any auto value
+    	if (dim_Value_Dining > 80) { sendCommand(Dining_Light,60) } // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,40) } // check if not equal to any auto value
+		sendCommand(Garden_Light1,ON)
+	}
+	if (vTimeOfDay.state == "NIGHT_DAY") { 
+		logInfo("scene_Switch.rules", "scene Switch to NIGHT_DAY" ) 
+	}
+	if (vTimeOfDay.state == "NIGHT") { 
+		logInfo("scene_Switch.rules", "scene Switch to NIGHT" )
+
+    	if (dim_Value_Kitchen > 40) { sendCommand(Kitchen_Light,25) } // check if and than change value
+		if (dim_Value_KitchenNis > 80) { sendCommand(KitchenNis_Light,0) } // check if not equal to any auto value
+    	if (dim_Value_Dining < 61) { sendCommand(Dining_Light,0) } // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,40) } // check if not equal to any auto value
+		sendCommand(Garden_Light1,ON)
+	}
+	if (vTimeOfDay.state == "BED") { 
+		logInfo("scene_Switch.rules", "scene Switch to BED see rule scene_AllLightOff" ) 
+	}
+	
+//rule "Kitchen Lights Manual"
+//when
+//    Item gLightsKitchenDim changed
+//then
+//    if (!gLightsKitchenDim.state instanceof Number)                // state is not of Type Number
+//        return;                                                    // stop rule
+//    val dimmerValue = gLightsKitchenDim.state as Number            // state is of Type Number, so store it as a value
+//    if (dimmerValue !=0 && dimmerValue !=60 && dimmerValue != 100) // check if not equal to any auto value
+//        Lighting_Scenes.postUpdate(3)                              // switch to state "Manual"
+//end	
+	
+//	logInfo("scene_LightAuto.rules", "Run the lightauto scene rule "+SceneEvening.state)
+//	sendCommand(Kitchen_Light,25)
+//	sendCommand(LivingRoom_Light,40)
+//	gGarden.sendCommand(ON)
+//  gGarden.members.filter[l|l.groupNames.contains("gLightSwitches")].forEach(i|i.sendCommand(ON))
+//    sendCommand(Garden_Light1,ON)
+//	postUpdate(SceneEvening, OFF)
+//	logInfo("scene_LightAuto.rules", "End the lightauto scene rule "+SceneEvening.state)
+end

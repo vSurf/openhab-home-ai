@@ -1,0 +1,128 @@
+sitemap myhome label="My Home" {
+ 
+ 	Frame {
+        Text item=Current_DateTime label="Weather and Astro [%1$tA, %1$td.%1$tm.%1$tY]" icon="sun_clouds" {
+            Frame label="Now" {
+                Switch item=Night_State label="Time of Day" mappings=[OFF="Day", ON="Night"]
+                Text item=Day_Phase icon="sunmoon"
+                Text item=Sunrise_Time icon="sunrise" visibility=[Night_State == ON]
+                Text item=Sunset_Time icon="sunset" visibility=[Night_State == OFF]
+				Text item=Sun_Azimuth icon="sun" 
+                Text item=Sun_Elevation icon="sunmoon" visibility=[Sun_Elevation > 0]
+                Text item=Moon_Elevation icon="sunmoon" visibility=[Moon_Elevation > 0]
+                Text item=Zodiac_Sign icon="zodiac"
+                Text item=Moon_Phase
+                Text item=Moon_Next_Full icon="fullmoon"
+                    visibility=[Moon_Phase == WAXING_CRESCENT,
+                                Moon_Phase == FIRST_QUARTER,
+                                Moon_Phase == WAXING_GIBBOUS,
+                                Moon_Phase == FULL]
+                Text item=Moon_Next_New icon="fullmoon"
+                    visibility=[Moon_Phase == WANING_GIBBOUS,
+                                Moon_Phase == THIRD_QUARTER,
+                                Moon_Phase == WANING_CRESCENT,
+                                Moon_Phase == NEW]
+            }
+//            Frame label="Weather Forecast"{
+//				Text item=Temperature icon="temperature"
+//				Text item=Clouds icon="sun_clouds"
+//				Text item=Humidity icon="humidity"
+//            }
+            Frame label="Weather Forecast"{
+				Text item=Temperature icon="temperature"
+                Text item=ApparentTemperature icon="temperature"
+				Text item=Clouds icon="sun_clouds"
+				Text item=Humidity icon="humidity"
+				Text item=Rain icon="rain"
+				Text item=WindSpeed icon="wind"
+                Text item=wLocation icon="home"
+            }			
+        }
+	}
+	
+	Frame label="Huis"{
+        Group item=gLivingroom label="Woonkamer"
+        Group item=gHall
+        Group item=gGarden
+    }
+
+    Frame label="Objecten"{
+        Text label="Lichten" icon="light" {
+            Default item=Kitchen_Light label="Keuken"
+			Default item=KitchenNis_Light label="Keuken-Nis"
+            Default item=Hallway_Light label="Gang"
+            Default item=Dining_Light label="Eettafel"
+            Default item=LivingRoom_Light label="Zithoek"
+			Default item=Garden_Light1 label="Tuin (Schutting)"
+			Default item=Garden_Light2 label="Tuin (Bomen)"
+        }
+
+        Text label="Zonnescherm" icon="rollershutter" {
+            Setpoint item=LivingRoom_Shutter label="Woonkamer" step=5
+        }
+    }
+	
+	Frame label="Scenes"{
+        Switch item=gLight label="Licht uit" mappings=[OFF="Knop"] 
+        Switch item=gScene label="Start Lights" mappings=[3.0="Knop"]
+		Switch item=gScene label="Start Scene" mappings=[1.0="Knop"]
+		Text item=Hallway_scene icon="fullmoon"
+		Text item=gScene icon="fullmoon"
+        Text item=vTimeOfDay {
+            Text item=vWakeup_Time 
+            Text item=vMorning_Time
+            Text item=vCooking_Time  
+            Text item=vDinner_Time 
+            Text item=vNight_Time  
+            Text item=vBed_Time 
+            Text item=vSunrise_Time
+            Text item=vSunset_Time 
+            Text item=vEvening_Time
+       }
+       Switch item=vTod_Trigger label="Trigger Time of Day" mappings=[ON="Knop"]
+        
+    }
+	
+    Frame label="OpenTherm Gateway" {
+        Text item=RoomTemperature icon="temperature" label="Room temperature [%.1f °C]" {
+            Text item=RoomTemperature icon="temperature" label="Room temperature [%.1f °C]"
+            Text item=RoomSetpoint icon="temperature" label="Room setpoint [%.1f °C]"
+            Setpoint item=TemporaryRoomSetpointOverride icon="temperature" label="Temporary room setpoint override [%.1f °C]" minValue=0 maxValue=30 step=0.1
+            Setpoint item=ConstantRoomSetpointOverride icon="temperature" label="Constant room setpoint override [%.1f °C]" minValue=0 maxValue=30 step=0.1
+            Text item=ControlSetpoint icon="temperature" label="Control setpoint [%.1f °C]"
+            Text item=DomesticHotWaterTemperature icon="temperature" label="Domestic hot water temperature [%.1f °C]"
+            Text item=DomesticHotWaterSetpoint icon="temperature" label="Domestic hot water setpoint [%.1f °C]"
+            Setpoint item=DomesticHotWaterSetpointOverride icon="temperature" label="Domestic hot water setpoint override [%.1f °C]" minValue=0 maxValue=100 step=0.1
+            Text item=BoilerWaterTemperature icon="temperature" label="Boiler water temperature [%.1f °C]"
+            Text item=ReturnWaterTemperature icon="temperature" label="Return water temperature [%.1f °C]"
+            Setpoint item=OutsideTemperature icon="temperature" label="Outside temperature [%.1f °C]" minValue=-40 maxValue=100 step=0.1
+            Text item=CentralHeatingWaterPressure icon="" label="Central heating water pressure [%.1f bar]"
+            Switch item=CentralHeatingEnabled icon="switch" label="Central heating enabled"
+            Switch item=CentralHeatingActive icon="switch" label="Central heating active"
+            Switch item=DomesticHotWaterEnabled icon="switch" label="Domestic hot water enabled"
+            Switch item=DomesticHotWaterActive icon="switch" label="Domestic hot water active"
+            Switch item=BurnerActive icon="switch" label="Burner active"
+            Text item=RelativeModulationLevel icon="" label="Relative modulation level [%.1f %%]"
+            Text item=MaximumRelativeModulationLevel icon="" label="Maximum relative modulation level [%.1f %%]"        
+            Switch item=Fault icon="" label="Fault indication"
+            Switch item=ServiceRequest icon="" label="Service required"
+            Switch item=LockoutReset icon="" label="Lockout-reset"
+            Switch item=LowWaterPress icon="" label="Low water pressure fault"
+            Switch item=GasFlameFault icon="" label="Gas or flame fault"
+            Switch item=AirPressFault icon="" label="Air pressure fault"
+            Switch item=waterOvTemp icon="" label="Water over-temperature fault"
+            Text item=OemFaultCode icon="" label="OEM fault code"
+        }
+        
+    }
+
+	Frame label="Nuts voorzieningen" {
+		Text item=Http_YouLess_Total label="Totaal Verbruik[%s kWh]" icon="energy" {
+			Text item=Http_YouLess_Total icon="energy"
+			Text item=Http_YouLess_Current icon="energy"
+			Text item=Http_YouLess_Signal icon="energy"
+			
+			Text item=gEnergy_kWh icon="energy"
+		}
+    }
+}

@@ -1,0 +1,12 @@
+// send outside temp to OTGW
+rule "send_OT"
+when
+    //Send on change of Outside Temperature
+    Item Temperature changed
+then
+	logInfo("send_OT.rules", "Start send OT to OTGW ")
+    
+    val sTemp = transform("REGEX", "(.*?) °C", Temperature.state.toString)
+    SendCommand.sendCommand("OT=" + sTemp)
+	logInfo("send_OT.rules", "Done send OT to OTGW Result: " + sTemp)
+end
