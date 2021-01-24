@@ -1,1 +1,1 @@
-vSurf
+This master version of openhab-home-ai is based on openhab2 (2.5.10-1)
