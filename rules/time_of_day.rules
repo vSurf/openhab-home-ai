@@ -1,3 +1,7 @@
+// import java.time.Duration
+// import java.time.LocalDateTime
+// import java.time.ZonedDateTime
+
 
 val logName = "Time Of Day"
 var Timer tod_Timer = null
@@ -12,10 +16,10 @@ when
   Time cron "0 1 7 * * ? *" or // triggers at 07:01AM 
   Time cron "0 21 7 * * ? *" or  // triggers at 07:21PM
   Time cron "0 1 17 * * ? *" or // triggers at 17:01PM 
-  Time cron "0 1 18 * * ? *" or  // triggers at 18:01PM
-  Time cron "0 1 19 * * ? *" or // triggers at 19:01PM 
-  Time cron "0 1 21 * * ? *" or  // triggers at 21:01PM
-  Time cron "0 46 23 * * ? *" or  // triggers at 23:46PM
+  Time cron "0 31 17 * * ? *" or  // triggers at 17:31PM
+  Time cron "0 11 19 * * ? *" or // triggers at 19:11PM 
+  Time cron "0 46 20 * * ? *" or  // triggers at 20:46PM
+  Time cron "0 55 23 * * ? *" or  // triggers at 23:55PM
   Item vTod_Trigger received command ON
 then
 
@@ -25,29 +29,36 @@ then
   // Update when changing static times
   // Jump to tomorrow and subtract to avoid problems at the change over to/from DST
   /////////////////////////////////////////////////////////////////////////////////
-val stTime_Wakeup  	= now.withTimeAtStartOfDay.plusHours(7)                  //"07:00"
-val stTime_Morning  = now.withTimeAtStartOfDay.plusHours(7).plusMinutes(20)  //"07:20"
-val stTime_Cooking  = now.withTimeAtStartOfDay.plusHours(17)                 //"17:00"
-val stTime_Dinner  	= now.withTimeAtStartOfDay.plusHours(18)                 //"18:00"
-val stTime_Evening  = now.withTimeAtStartOfDay.plusHours(19)                 //"19:00"
-val stTime_Night  	= now.withTimeAtStartOfDay.plusHours(21)                 //"21:00"
-val stTime_Bed   	  = now.withTimeAtStartOfDay.plusHours(23).plusMinutes(45) //"23:45"
+//val stTime_Wakeup  	= now.withTimeAtStartOfDay.plusHours(7)                  //"07:00" -> used before OH3
+val stTime_Wakeup   = now.withHour(7).withMinute(0)   //"07:00"
+val stTime_Morning  = now.withHour(7).withMinute(20)  //"07:20"
+val stTime_Cooking  = now.withHour(17).withMinute(0)  //"17:00"
+val stTime_Dinner  	= now.withHour(17).withMinute(30)  //"17:30"
+val stTime_Evening  = now.withHour(19).withMinute(10)  //"19:10"
+val stTime_Night  	= now.withHour(20).withMinute(45)  //"20:45"
+val stTime_Bed   	  = now.withHour(23).withMinute(54) //"23:54"
 
-// Convert the Astro Items to Joda DateTime
-val stStart_Day = new DateTime(vSunrise_Time.state.toString) 
-val stStart_Evening = new DateTime(vSunset_Time.state.toString)
-val stStart_Afternoon = (new DateTime(vSunset_Time.state.toString)).minusHours(1).minusMinutes(30)
+// Convert the Astro Items from DateTimeType to Java Time (ZonedDateTime)
+val stStart_Day = (vSunrise_Time.state as DateTimeType).getZonedDateTime()
+val stStart_Evening = (vSunset_Time.state as DateTimeType).getZonedDateTime()
+val stStart_Afternoon = (vSunset_Time.state as DateTimeType).getZonedDateTime().minusHours(1).minusMinutes(30)
 
+logInfo("tod_calc_tod_state.rule", "Start Day date: " + stStart_Day)
+logInfo("tod_calc_tod_state.rule", "Start Evening date: " + stStart_Evening)
 logInfo("tod_calc_tod_state.rule", "Start Afternoon date: " + stStart_Afternoon)
 
-vWakeup_Time.postUpdate  (stTime_Wakeup.toString)
-vMorning_Time.postUpdate (stTime_Morning.toString)
-vCooking_Time.postUpdate  (stTime_Cooking.toString)
-vDinner_Time.postUpdate  (stTime_Dinner.toString)
-vNight_Time.postUpdate   (stTime_Night.toString)
-vEvening_Time.postUpdate (stTime_Evening.toString)
-vBed_Time.postUpdate     (stTime_Bed.toString)
+vWakeup_Time.postUpdate (stTime_Wakeup.toLocalDateTime().toString())
+vMorning_Time.postUpdate (stTime_Morning.toLocalDateTime().toString())
+vCooking_Time.postUpdate  (stTime_Cooking.toLocalDateTime().toString())
+vDinner_Time.postUpdate  (stTime_Dinner.toLocalDateTime().toString())
+vNight_Time.postUpdate   (stTime_Night.toLocalDateTime().toString())
+vEvening_Time.postUpdate (stTime_Evening.toLocalDateTime().toString())
+vBed_Time.postUpdate     (stTime_Bed.toLocalDateTime().toString())
 
+logInfo("tod_calc_tod_state.rule", "Test Date Compare0: " + vSunrise_Time.toString())
+logInfo("tod_calc_tod_state.rule", "Test Date Compare1: " + (vSunrise_Time.state as DateTimeType).getZonedDateTime())
+
+//(MyDateTimeItem.state as DateTimeType).getZonedDateTime()
   // Calculate the current time of day
   var curr = "UNKNOWN"
   switch now {
@@ -65,30 +76,29 @@ vBed_Time.postUpdate     (stTime_Bed.toString)
         curr = "MORNING" 
       }
     }
-  	case now.isAfter(stStart_Afternoon) && now.isBefore(stTime_Cooking): curr = "AFTERNOON"
     case now.isAfter(stTime_Cooking) && now.isBefore(stTime_Dinner): {
-      if (now.isBefore(stStart_Evening)) {
+      if (now.isBefore(stStart_Afternoon)) {
          curr = "COOKING_DAY"
       } else {
          curr = "COOKING"
       }      
     }
     case now.isAfter(stTime_Dinner) && now.isBefore(stTime_Evening): {
-      if (now.isBefore(stStart_Evening)) {
+      if (now.isBefore(stStart_Afternoon)) {
          curr = "DINNER_DAY" 
       } else {
          curr = "DINNER" 
       }      
     }
     case now.isAfter(stTime_Evening) && now.isBefore(stTime_Night): {
-      if (now.isBefore(stStart_Evening)) {
+      if (now.isBefore(stStart_Afternoon)) {
          curr = "EVENING_DAY"
       } else {
          curr = "EVENING" 
       }     
     }
     case now.isAfter(stTime_Night) && now.isBefore(stTime_Bed): {
-      if (now.isBefore(stStart_Evening)) { 
+      if (now.isBefore(stStart_Afternoon)) { 
         curr = "NIGHT_DAY"
       } else {
         curr = "NIGHT" 

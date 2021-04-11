@@ -10,4 +10,4 @@ DateTime vBed_Time "BED [%1$tH:%1$tM]" <bedroom_blue>
 
 DateTime vSunrise_Time "DAY [%1$tH:%1$tM]" <sun> { channel="astro:sun:local:rise#start" }
 DateTime vSunset_Time "EVENING [%1$tH:%1$tM]" <sunset> { channel="astro:sun:local:set#start" }
-//DateTime vEvening_Time "AFTERNOON [ %1$tH:%1$tM]" <sunset> { channel="astro:sun:local:set#start"}
+DateTime vEvening_Time "AFTERNOON [ %1$tH:%1$tM]" <sunset> { channel="astro:sun:local:set#start"}
