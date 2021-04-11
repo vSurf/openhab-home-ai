@@ -38,11 +38,15 @@ Number								Garden_Tree_Energy		"Tuin Schutting [%s kWh]"					<garden>		(gGard
 Number								Garden_Fence_Energy		"Tuin Bomen [%s kWh]"						<garden>		(gGarden, gEnergy_kWh)			{channel="zwave:device:12356614:node9:meter_kwh2"}
 
 // Http items
-String								Http_YouLess_Total		"Stroomverbruik totaal [%s kWh]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }
-Number								Http_YouLess_Current	"Stroomverbruik actueel [%,.0f Watt]"		<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }
-Number								Http_YouLess_Signal		"Stroomverbruik signaal [%.0f %%]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }
-Number								Measured_kwh			"Gemeten Stroomverbruik [%s kWh]"			<energy>		(gEnergy)
+//String								Http_YouLess_Total		"Stroomverbruik totaal [%s kWh]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.cnt)]" }
+//Number								Http_YouLess_Current	"Stroomverbruik actueel [%,.0f Watt]"		<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }	//192.168.1.20/a?f=j:10000:JSONPATH($.pwr)]" }
+//Number								Http_YouLess_Signal		"Stroomverbruik signaal [%.0f %%]"			<energy>		(gEnergy)						{ http="<[http://192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }	//192.168.1.20/a?f=j:30000:JSONPATH($.lvl)]" }
+//Number								Measured_kwh			"Gemeten Stroomverbruik [%s kWh]"			<energy>		(gEnergy)
 
+String								YouLess_Total		    "Stroomverbruik totaal [%s kWh]"			<energy>		(gEnergy)						{channel="http:url:youless:YouLess_Total"}
+Number								YouLess_Current	        "Stroomverbruik actueel [%,.0f Watt]"		<energy>		(gEnergy)						{channel="http:url:youless:YouLess_Current"}
+Number								YouLess_Signal		    "Stroomverbruik signaal [%.0f %%]"			<energy>		(gEnergy)						{channel="http:url:youless:YouLess_Signal"}
+Number								YouLess_Measured_kwh	"Gemeten Stroomverbruik [%s kWh]"			<energy>		(gEnergy)
 
 //Scene items
 Number								Kitchen_scene			"Scene ID[%s]"								<room>			(gScene)						{channel="zwave:device:12356614:node7:scene_number"}
@@ -60,3 +64,4 @@ Number:Dimensionless				Humidity				"[%d %unit%]"                               
 Number:Length						Rain					"[%.1f %unit%]"                             <rain>											{channel="openweathermap:weather-and-forecast:api:local:current#rain"}
 Number:Speed						WindSpeed				"WindSpeed [%.1f km/h]"                     <wind>											{channel="openweathermap:weather-and-forecast:api:local:current#wind-speed"}
 String								wLocation				"Location [%s]"																	            {channel="openweathermap:weather-and-forecast:api:local:station#name"}
+

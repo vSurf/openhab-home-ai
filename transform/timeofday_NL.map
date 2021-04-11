@@ -2,8 +2,11 @@ WAKEUP= Wakker Worden
 MORNING= Ochtend
 DAY= Dag
 COOKING= Kooken
+COOKING_DAY= Kooken Daglight
 DINNER= Etenstijd
+DINNER_DAY= Etenstijd Daglight
 EVENING= Avond
+EVENING_DAY= Avond Daglight
 NIGHT= Nacht
 BED= Bed Tijd
 AFTERNOON=Namiddag
@@ -11,3 +14,4 @@ AFTERNOON=Namiddag
 //
 NULL=onbekend ⁉
 -=onbekend ⁉
+UNKNOWN= onbekend ⁉

@@ -3,10 +3,12 @@ rule "download_hosts"
 when
     //Time cron At 01:00 AM
     Time cron "0 0 1 1/1 * ? *"
+    //Time cron "0/5 * * * ? *"
 then
 	logInfo("download_hosts.rules", "Run the download_hosts rule ")
 	
-    executeCommandLine("curl -s -o /etc/openhab2/html/hosts0.txt https://winhelp2002.mvps.org/hosts.txt", 5000)
-    executeCommandLine("curl -s -o /etc/openhab2/html/hosts1.txt https://hosts.oisd.nl/light/", 5000)
+    //executeCommandLine(Duration.ofSeconds(60), "su openhab curl https://winhelp2002.mvps.org/hosts.txt > /etc/openhab/html/hosts10.txt")
+    //executeCommandLine(Duration.ofSeconds(60), "curl \"https://winhelp2002.mvps.org/hosts.txt\" -s -o /etc/openhab2/html/hosts0.txt")
+    //executeCommandLine(Duration.ofSeconds(60), "curl -s -o /etc/openhab2/html/hosts1.txt https://hosts.oisd.nl/light/")
     logInfo("download_hosts.rules", "Done running the download_hosts rule ")
 end

@@ -66,10 +66,10 @@ when
 	Item gScene received update 1.0
 then
 	
-	val dim_Value_Kitchen = Kitchen_Light.state as Number  // state is of Type Number, so store it as a value
-	val dim_Value_KitchenNis = KitchenNis_Light.state as Number  // state is of Type Number, so store it as a value
-	val dim_Value_Dining = Dining_Light.state as Number  // state is of Type Number, so store it as a value
-	val dim_Value_LivingRoom = LivingRoom_Light.state as Number  // state is of Type Number, so store it as a value
+	var dim_Value_Kitchen = Kitchen_Light.state as Number  // state is of Type Number, so store it as a value
+	var dim_Value_KitchenNis = KitchenNis_Light.state as Number  // state is of Type Number, so store it as a value
+	var dim_Value_Dining = Dining_Light.state as Number  // state is of Type Number, so store it as a value
+	var dim_Value_LivingRoom = LivingRoom_Light.state as Number  // state is of Type Number, so store it as a value
 
 
 	if (vTimeOfDay.state == "WAKEUP_DAY") {
@@ -94,7 +94,7 @@ then
 	if (vTimeOfDay.state == "DAY") { 
 		logInfo("scene_Switch.rules", "scene Switch to DAY 45 minus after day ligts of by scene_AllOff" ) 
 		
-		sendCommand(gGarden,OFF)
+		sendCommand(Garden_Light1,OFF)
 		
 		timer_AllLightsOff = null
 		timer_AllLightsOff = createTimer(now.plusMinutes(45), [| 
@@ -140,12 +140,12 @@ then
 		logInfo("scene_Switch.rules", "scene Switch to EVENING_DAY" ) 
 	}
 	if (vTimeOfDay.state == "EVENING") { 
-		logInfo("scene_Switch.rules", "scene Switch to EVENING" )
+		logInfo("scene_Switch.rules", "scene Switch to EVENING" )							
 
-    	if (dim_Value_Kitchen > 40) { sendCommand(Kitchen_Light,25) } // check if and than change value
-		if (dim_Value_KitchenNis < 80) { sendCommand(KitchenNis_Light,100) } // check if not equal to any auto value
-    	if (dim_Value_Dining > 80) { sendCommand(Dining_Light,60) } // check if not equal to any auto value
-    	if (dim_Value_LivingRoom < 80) { sendCommand(LivingRoom_Light,40) } // check if not equal to any auto value
+    	if (dim_Value_Kitchen > 40) {sendCommand(Kitchen_Light,25)} // check if and than change value
+		if (dim_Value_KitchenNis < 80) {sendCommand(KitchenNis_Light,100)} // check if not equal to any auto value
+    	if (dim_Value_Dining > 80) {sendCommand(Dining_Light,60)} // check if not equal to any auto value
+    	if (dim_Value_LivingRoom < 80) {sendCommand(LivingRoom_Light,40) }// check if not equal to any auto value
 		sendCommand(Garden_Light1,ON)
 	}
 	if (vTimeOfDay.state == "NIGHT_DAY") { 
