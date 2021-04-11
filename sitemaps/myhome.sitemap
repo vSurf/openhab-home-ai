@@ -117,10 +117,10 @@ sitemap myhome label="My Home" {
     }
 
 	Frame label="Nuts voorzieningen" {
-		Text item=Http_YouLess_Total label="Totaal Verbruik[%s kWh]" icon="energy" {
-			Text item=Http_YouLess_Total icon="energy"
-			Text item=Http_YouLess_Current icon="energy"
-			Text item=Http_YouLess_Signal icon="energy"
+		Text item=YouLess_Total label="Totaal Verbruik[%s kWh]" icon="energy" {
+			Text item=YouLess_Total icon="energy"
+			Text item=YouLess_Current icon="energy"
+			Text item=YouLess_Signal icon="energy"
 			
 			Text item=gEnergy_kWh icon="energy"
 		}
